@@ -9,6 +9,9 @@ def read_data(file):
     cat_vars = data.select_dtypes(include='object')
     data[cat_vars.columns] = data.select_dtypes(['object']).apply(lambda x: x.astype('category'))
 
+    return data
+
+
 class Data:
     def __init__(self, file):
         pass

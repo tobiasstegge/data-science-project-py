@@ -5,6 +5,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# project
+images/
+
 # custom mac
 .DS_Store
 
