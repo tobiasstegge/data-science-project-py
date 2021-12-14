@@ -98,7 +98,7 @@ def multiple_bar_chart(xvalues: list, yvalues: dict, ax: plt.Axes = None, title:
     width = 0.8 / nseries
     pos_center = pos_group + (nseries-1)*width/2
     ax.set_xticks(pos_center)
-    ax.set_xticklabels(xvalues)
+    ax.set_xticklabels(xvalues, rotation=45)
     i = 0
     legend = []
     for metric in yvalues:

@@ -6,10 +6,8 @@ def dimensionality(data):
     nr_records = data.shape[0]
     nr_variables = data.shape[1]
 
-    fig, ax = plt.subplots()
-    values = [nr_records, nr_variables]
     bar_chart(['Nr. of Records', 'Nr. of Variables'], [nr_records, nr_variables], title='Data Dimensionality')
-    plt.savefig('images/dimensionality.png')
+    plt.savefig('./images/dimensionality.png')
     # plt.show()
 
     # variable types
@@ -19,7 +17,7 @@ def dimensionality(data):
         counts[tp] = len(variable_types[tp])
     plt.figure(figsize=(4, 2))
     bar_chart(list(counts.keys()), list(counts.values()), title='Nr of variables per type')
-    plt.savefig('images/variable_types.png')
+    plt.savefig('./images/variable_types.png')
     # plt.show()
 
     # missing values
@@ -32,7 +30,7 @@ def dimensionality(data):
     plt.figure(figsize=(8, 8))
     bar_chart(list(missing_values.keys()), list(missing_values.values()), title='Nr of missing values per variable',
               xlabel='variables', ylabel='nr missing values', rotation=True)
-    plt.savefig('images/missing_variables.png')
+    plt.savefig('./images/missing_variables.png')
     # plt.show()
 
 
@@ -45,7 +43,7 @@ def distribution(data):
     ax.boxplot(data_cleaned)
     ax.set_title('Boxplot for Person Age')
     ax.set_ylim([0, 150])
-    plt.savefig('images/boxplot_person_age.png')
+    plt.savefig('./images/boxplot_person_age.png')
 
     # n of outliers for PERSON_AGE
     NR_STDEV = 2
@@ -64,7 +62,7 @@ def distribution(data):
 
     plt.figure()
     bar_chart(list(outliers.keys()), list(outliers.values()), title="N. of Outliers")
-    plt.savefig('images/n_of_outliers.png')
+    plt.savefig('./images/n_of_outliers.png')
 
     # symbolic values
     symbolic_vars = get_variable_types(data)['Symbolic']
@@ -76,4 +74,4 @@ def distribution(data):
         plt.figure()
         values_counts = data[var].value_counts()
         bar_chart(values_counts.keys(), values_counts.values, title=f'Histogram for {var}', rotation=True)
-        plt.savefig(f'images/histograms_symbolic_{var}.png')
+        plt.savefig(f'./images/histograms_symbolic_{var}.png')
