@@ -1,5 +1,5 @@
 from matplotlib.pyplot import subplots, savefig, figure, title
-from ds_labs.ds_charts import get_variable_types, bar_chart, choose_grid, HEIGHT, multiple_bar_chart
+from ds_labs.ds_charts import get_variable_types, bar_chart, choose_grid, HEIGHT
 from seaborn import heatmap
 
 
@@ -75,7 +75,7 @@ def distribution(data):
 
     outliers = {'iqr': outliers_iqr, 'stdev': outliers_stdev}
     figure(figsize=(12, HEIGHT))
-    multiple_bar_chart(numeric_vars, outliers, title='Nr of outliers per variable', xlabel='variables',
+    bar_chart(numeric_vars, outliers, title='Nr of outliers per variable', xlabel='variables',
                        ylabel='nr outliers', percentage=False)
     savefig('images/outliers.png')
 
