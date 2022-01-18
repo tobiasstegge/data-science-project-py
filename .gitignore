@@ -14,8 +14,8 @@ images/
 # C extensions
 *.so
 
-.csv
-.png
+*.csv
+*.png
 
 # Distribution / packaging
 .Python
