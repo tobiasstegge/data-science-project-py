@@ -23,12 +23,15 @@ if __name__ == '__main__':
     data_outliers = impute_outliers(data_mv)
     data_dummified = dummification(data_outliers)
     data_scaled = scaling(data_dummified)
-    data_balanced_oversample = balancing_oversample(data_scaled)
-    data_balanced_undersample = balancing_undersample(data_scaled)
+
+
+    # Todo: BALANCING AFTER TRAINING
+    data_balanced_oversample = balancing_oversample(data_dummified)
+    data_balanced_undersample = balancing_undersample(data_dummified)
 
     # classification
     train_other, test_other, train_target, test_target = split_data(data_balanced_undersample, target='PERSON_INJURY',
-                                                                    positive='Injured', negative='Killed')
+                                                                    positive='Injured', negative='Killed', train_size=0.8)
 
     model_nb = GaussianNB().fit(train_other, train_target)
     model_nb_cat = BernoulliNB().fit(train_other, train_target)

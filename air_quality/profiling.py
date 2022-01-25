@@ -1,6 +1,7 @@
-from matplotlib.pyplot import subplots, savefig, figure, title
-from ds_labs.ds_charts import get_variable_types, bar_chart, choose_grid, HEIGHT
+from matplotlib.pyplot import subplots, savefig, figure, title, bar, xticks
+from ds_labs.ds_charts import get_variable_types, bar_chart, choose_grid, HEIGHT, multiple_bar_chart
 from seaborn import heatmap
+from collections import Counter
 
 
 def dimensionality(data):
@@ -8,7 +9,7 @@ def dimensionality(data):
     nr_variables = data.shape[1]
 
     bar_chart(['Nr. of Records', 'Nr. of Variables'], [nr_records, nr_variables], title='Data Dimensionality')
-    savefig('./images/dimensionality.png')
+    savefig('./images/profiling/dimensionality.png')
     # plt.show()
 
     # variable types
@@ -18,7 +19,7 @@ def dimensionality(data):
         counts[tp] = len(variable_types[tp])
     figure(figsize=(4, 2))
     bar_chart(list(counts.keys()), list(counts.values()), title='Nr of variables per type')
-    savefig('./images/variable_types.png')
+    savefig('./images/profiling/variable_types.png')
 
     # missing values
     missing_values = {}
@@ -30,7 +31,7 @@ def dimensionality(data):
     figure(figsize=(8, 8))
     bar_chart(list(missing_values.keys()), list(missing_values.values()), title='Nr of missing values per variable',
               xlabel='variables', ylabel='nr missing values', rotation=True)
-    savefig('./images/missing_variables.png')
+    savefig('./images/profiling/missing_variables.png')
 
 
 def distribution(data):
@@ -43,6 +44,7 @@ def distribution(data):
         data_cleaned[key] = data[key].dropna().values
 
     # boxplot
+    print('Making boxplots')
     numeric_vars = get_variable_types(data)['Numeric']
     rows, cols = choose_grid(len(numeric_vars))
     fig, axs = subplots(rows, cols, figsize=(cols * HEIGHT, rows * HEIGHT), squeeze=False)
@@ -51,9 +53,10 @@ def distribution(data):
         axs[i, j].set_title('Boxplot for %s' % var)
         axs[i, j].boxplot(data[var].dropna().values)
         i, j = (i + 1, 0) if (idx + 1) % cols == 0 else (i, j + 1)
-    savefig('images/single_boxplots.png')
+    savefig('images/profiling/single_boxplots.png')
 
     # n of outliers
+    print('Making Outlier Diagrans')
     NR_STDEV: int = 2
     numeric_vars = get_variable_types(data)['Numeric']
     if [] == numeric_vars:
@@ -75,11 +78,12 @@ def distribution(data):
 
     outliers = {'iqr': outliers_iqr, 'stdev': outliers_stdev}
     figure(figsize=(12, HEIGHT))
-    bar_chart(numeric_vars, outliers, title='Nr of outliers per variable', xlabel='variables',
+    multiple_bar_chart(numeric_vars, outliers, title='Nr of outliers per variable', xlabel='variables',
                        ylabel='nr outliers', percentage=False)
-    savefig('images/outliers.png')
+    savefig('images/profiling/outliers.png')
 
     # histograms numeric data
+    print('Making Histograms of Numeric Data')
     numeric_vars = get_variable_types(data)['Numeric']
     fig, axs = subplots(rows, cols, figsize=(cols * HEIGHT, rows * HEIGHT), squeeze=False)
     i, j = 0, 0
@@ -87,27 +91,33 @@ def distribution(data):
         axs[i, j].set_title('Histogram for %s' % numeric_vars[n])
         axs[i, j].set_xlabel(numeric_vars[n])
         axs[i, j].set_ylabel("nr records")
-        axs[i, j].hist(data[numeric_vars[n]].dropna().values, 'auto')
+        axs[i, j].hist(data[numeric_vars[n]].dropna().values, bins=100)
         i, j = (i + 1, 0) if (n + 1) % cols == 0 else (i, j + 1)
-    savefig('images/single_histograms_numeric.png')
+    savefig('images/profiling/histograms_numeric.png')
 
     # symbolic values
+    print('Making Histogram of Symbolic Data')
     symbolic_vars = get_variable_types(data)['Symbolic']
-    symbolic_vars.remove('City_EN')
-    symbolic_vars.remove('GbCity')
     for idx, var in enumerate(symbolic_vars):
-        figure()
-        values_counts = data[var].value_counts()
-        bar_chart(values_counts.keys(), values_counts.values, title=f'Histogram for {var}', rotation=True)
-        savefig(f'./images/histograms_symbolic_{var}.png')
+        figure(figsize=(10, 5))
+        occurrences_counts = data[var].value_counts()
+        value_counts = Counter(occurrences_counts)
+        bar_chart([str(i) for i in  list(value_counts.keys())], list(value_counts.values()), title=f'Chart of Number of Occurrences of Cities for {var}')
+        savefig(f'./images/profiling/histograms_symbolic/barchart_occurrences_{var}.png')
+        for idx, occurrences_split in enumerate([occurrences_counts[i:i + 100] for i in range(0, len(occurrences_counts), 100)]):
+            figure(figsize=(40, 25))
+            bar_chart([str(key) for key in occurrences_split.keys()], occurrences_split.values, title=f'Histogram for {var}',
+                      rotation=True)
+            savefig(f'./images/profiling/histograms_symbolic/histograms_symbolic_{var}_{idx + 1}.png')
 
 
 def sparsity(data):
         # scatter
+        print('Creating Scatterplots')
         numeric_vars = get_variable_types(data)['Numeric']
         numeric_vars_means = [var for var in numeric_vars if var[-4:] == 'Mean']
-        data_means = data[numeric_vars_means]
 
+        # print scatter plots means
         rows, cols = len(numeric_vars_means) - 1, len(numeric_vars_means) - 1
         fig, axs = subplots(rows, cols, figsize=(cols * HEIGHT, rows * HEIGHT), squeeze=False)
         for i in range(len(numeric_vars_means)):
@@ -118,14 +128,36 @@ def sparsity(data):
                 axs[i, j - 1].set_xlabel(var1)
                 axs[i, j - 1].set_ylabel(var2)
                 axs[i, j - 1].scatter(data[var1], data[var2])
-        savefig(f'images/sparsity_study_numeric.png')
+        savefig(f'images/profiling/sparsity_study_numeric_means.png')
 
-        # heatmap
-        print("Creating Heatmap")
+        # scatter plots for all
+        rows, cols = len(numeric_vars) - 1, len(numeric_vars) - 1
+        fig, axs = subplots(rows, cols, figsize=(cols * HEIGHT, rows * HEIGHT), squeeze=False)
+        for i in range(len(numeric_vars)):
+            var1 = numeric_vars[i]
+            for j in range(i + 1, len(numeric_vars)):
+                var2 = numeric_vars[j]
+                axs[i, j - 1].set_title("%s x %s" % (var1, var2))
+                axs[i, j - 1].set_xlabel(var1)
+                axs[i, j - 1].set_ylabel(var2)
+                axs[i, j - 1].scatter(data[var1], data[var2])
+        savefig(f'images/profiling/sparsity_study_numeric.png')
+
+        # heatmap for means
+        data_numeric_means = data[numeric_vars_means]
+        print("Creating Heatmap for Means")
         figure(figsize=[16, 16])
-        corr_mtx = abs(data_means.corr())
-        print(corr_mtx)
+        corr_mtx = abs(data_numeric_means.corr())
         heatmap(abs(corr_mtx), xticklabels=corr_mtx.columns, yticklabels=corr_mtx.columns, annot=True, cmap='Blues')
-        title('Correlation analysis')
-        savefig(f'images/correlation_analysis2.png')
+        title('Correlation analysis for just Means of Values')
+        savefig(f'images/profiling/heatmap_means.png')
+
+        # heatmap for all
+        data_numeric = data[numeric_vars]
+        print("Creating Heatmap for All Numeric")
+        figure(figsize=[16, 16])
+        corr_mtx = abs(data_numeric.corr())
+        heatmap(abs(corr_mtx), xticklabels=corr_mtx.columns, yticklabels=corr_mtx.columns, annot=True, cmap='Blues')
+        title('Correlation analysis for all Values')
+        savefig(f'images/profiling/heatmap.png')
 

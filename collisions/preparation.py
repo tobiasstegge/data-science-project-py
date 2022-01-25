@@ -3,7 +3,7 @@ from pandas import concat, DataFrame
 from ds_labs.ds_charts import get_variable_types
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
 from numpy import nan, logical_and
-from matplotlib.pyplot import subplots, savefig
+from matplotlib.pyplot import subplots
 
 
 def drop_columns_missing_values(data, threshold_factor):
@@ -98,6 +98,17 @@ def scaling(data):
 
     scaler = StandardScaler(with_mean=True, with_std=True, copy=True).fit(data_numeric)
     tmp_standard = DataFrame(scaler.transform(data_numeric), index=data.index, columns=numeric_vars)
+    tmp_standard.boxplot()
+
+    fig, axs = subplots(1, 3, figsize=(20, 10), squeeze=False)
+    axs[0, 0].set_title('Original data')
+    data_numeric.boxplot(ax=axs[0, 0])
+    axs[0, 1].set_title('Z-score normalization')
+    tmp_standard.boxplot(ax=axs[0, 1])
+    axs[0, 2].set_title('MinMax normalization')
+    norm_data_minmax.boxplot(ax=axs[0, 2])
+    show()
+
     norm_data_zscore = concat([tmp_standard, data_symbolic, data_bool], axis=1)
     norm_data_zscore.to_csv('data/scaled_zscore.csv', index=False)
     return norm_data_zscore
