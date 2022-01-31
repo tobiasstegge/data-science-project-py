@@ -6,7 +6,7 @@ from pandas import DataFrame, concat, unique
 from matplotlib.dates import _reset_epoch_test_example, set_epoch, AutoDateLocator, AutoDateFormatter
 from warnings import simplefilter
 from sklearn.metrics import confusion_matrix, plot_roc_curve
-from ds_labs import config as cfg
+import ds_labs.config as cfg
 from datetime import datetime
 from sklearn.tree import export_graphviz
 from matplotlib.font_manager import FontProperties
@@ -125,6 +125,7 @@ def plot_evaluation_results(labels: ndarray, trn_y, prd_trn, tst_y, prd_tst):
         'Specificity': [tn_trn / (tn_trn + fp_trn), tn_tst / (tn_tst + fp_tst)],
         'Precision': [tp_trn / (tp_trn + fp_trn), tp_tst / (tp_tst + fp_tst)]}
 
+    print(tn_tst, fp_tst, fn_tst, tp_tst)
     fig, axs = plt.subplots(1, 2, figsize=(2 * HEIGHT, HEIGHT))
     multiple_bar_chart(['Train', 'Test'], evaluation, ax=axs[0], title="Model's performance over Train and Test sets", percentage=True)
     plot_confusion_matrix(cnf_mtx_tst, labels, ax=axs[1], title='Test')
@@ -227,7 +228,7 @@ def compute_mse(X: ndarray, labels: list, centroids: list) -> float:
     partial = list(partial * partial)
     partial = [sum(el) for el in partial]
     partial = sum(partial)
-    return math.sqrt(partial) / (n-1)
+    return partial / (n-1)
 
 
 def two_scales(ax1, time, data1, data2, c1, c2, xlabel='', ylabel1='', ylabel2=''):

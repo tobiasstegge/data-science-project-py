@@ -2,6 +2,7 @@ from sklearn.metrics import plot_roc_curve
 from pandas import unique
 from matplotlib.pyplot import figure, savefig, gca, Axes
 from sklearn.metrics import confusion_matrix
+from re import sub
 
 
 def create_confusion_matrix(model, test_target, test_records):
@@ -19,7 +20,7 @@ def create_confusion_matrix(model, test_target, test_records):
           f'Ratio: {(tp + tn) / (tn + fp + fn + tp)}')
 
 
-def plot_roc_chart(models, test_other, test_target, target: str = '', ax: Axes = None):
+def roc_chart(model, test_other, test_target, target: str = '', ax: Axes = None):
     print('Creating ROC Chart')
     figure()
     if ax is None:
@@ -31,7 +32,7 @@ def plot_roc_chart(models, test_other, test_target, target: str = '', ax: Axes =
     ax.set_title('ROC chart for %s' % target)
 
     ax.plot([0, 1], [0, 1], color='navy', label='random', linewidth=1, linestyle='--',  marker='')
-    for clf in models.keys():
-        plot_roc_curve(models[clf], test_other, test_target, ax=ax, marker='', linewidth=1)
+    for clf in model.keys():
+        plot_roc_curve(model[clf], test_other, test_target, ax=ax, marker='', linewidth=1)
     ax.legend(loc="lower right")
-    savefig('images/roc_chart.png')
+    savefig(f'images/classification/{sub("[^A-Za-z0-9]+","",str.lower(str(model)))}_roc_chart.png')
