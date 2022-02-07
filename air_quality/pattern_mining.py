@@ -7,16 +7,15 @@ from ds_labs.ds_charts import get_variable_types
 
 def pattern_mining(data):
     #data = dummify(data, data.columns)
-    MIN_SUP: float = 0.1
+    MIN_SUP: float = 0.0001
     var_min_sup = [0.002, 0.001] + [i*MIN_SUP for i  in range(100, 0, -10)]
 
     binary_vars = get_variable_types(data)['Binary']
     data_binary = data[binary_vars]
-    dropped = data_binary.drop(columns=['PERSON_INJURY'])
-    data_sample = dropped.sample(int(0.20 * len(dropped)))
+    data_sample = data.sample(int(0.10 * len(data)))
 
     patterns = apriori(data_sample, min_support=MIN_SUP, use_colnames=True, verbose=True)
-    print(len(patterns),'patterns')
+    print(len(patterns), 'patterns')
     nr_patterns = []
     for sup in var_min_sup:
         pat = patterns[patterns['support']>=sup]

@@ -4,7 +4,6 @@ from matplotlib.pyplot import title, savefig, figure
 
 
 def select_redundant(data, threshold_correlation):
-    all_data = data
     correlation_mtx = abs(data.corr())
     figure(figsize=[15, 15])
     heatmap(correlation_mtx, xticklabels=correlation_mtx.columns, yticklabels=correlation_mtx.columns, annot=True,
@@ -26,7 +25,7 @@ def select_redundant(data, threshold_correlation):
                     selected_to_drop.append(var)
     print(f'Variables selected to drop {selected_to_drop} on threshold {threshold_correlation}')
 
-    return all_data.drop(columns=selected_to_drop)
+    return data.drop(columns=selected_to_drop)
 
 
 def select_low_variance(data, threshold_variance):

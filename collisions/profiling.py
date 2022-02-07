@@ -12,7 +12,7 @@ def dimensionality(data):
     nr_variables = data.shape[1]
 
     bar_chart(['Nr. of Records', 'Nr. of Variables'], [nr_records, nr_variables], title='Data Dimensionality')
-    savefig('./images/dimensionality.png')
+    savefig('./images/profiling/dimensionality.png')
 
     # variable types
     print("Creating Variable Types Charts")
@@ -22,7 +22,7 @@ def dimensionality(data):
         counts[tp] = len(variable_types[tp])
     figure(figsize=(4, 2))
     bar_chart(list(counts.keys()), list(counts.values()), title='Nr of variables per type')
-    savefig('./images/variable_types.png')
+    savefig('./images/profiling/variable_types.png')
 
     # missing values
     print("Creating Missing Values Charts")
@@ -35,7 +35,8 @@ def dimensionality(data):
     figure(figsize=(8, 8))
     bar_chart(list(missing_values.keys()), list(missing_values.values()), title='Nr of missing values per variable',
               xlabel='variables', ylabel='nr missing values', rotation=True)
-    savefig('./images/missing_variables.png')
+    print('Missing Values:', missing_values)
+    savefig('./images/profiling/missing_variables.png')
 
 
 def distribution(data):
@@ -47,7 +48,7 @@ def distribution(data):
     ax.boxplot(data_cleaned)
     ax.set_title('Boxplot for Person Age')
     ax.set_ylim([0, 150])
-    savefig('./images/boxplot_person_age.png')
+    savefig('./images/profiling/boxplot_person_age.png')
 
     # n of outliers for PERSON_AGE
     NR_STDEV = 2
@@ -65,7 +66,7 @@ def distribution(data):
 
     figure()
     bar_chart(list(outliers.keys()), list(outliers.values()), title="N. of Outliers", xlabel='PERSON_AGE')
-    savefig('./images/n_of_outliers.png')
+    savefig('./images/profiling/n_of_outliers.png')
 
     # histograms symbolic values
     print("Creating Histograms for Symbolic Variables")
@@ -79,7 +80,7 @@ def distribution(data):
         bar_chart(counts.index.to_list(), counts.values, ax=axs[i, j], title='Histogram for %s' % symbolic_vars[n],
                   xlabel=symbolic_vars[n], ylabel='nr records', percentage=False, rotation=False)
         i, j = (i + 1, 0) if (n + 1) % cols == 0 else (i, j + 1)
-    savefig('images/histograms_symbolic.png')
+    savefig('images/profiling/histograms_symbolic.png')
 
     # histogram binary values
     print("Creating Histograms for Binary Variables")
@@ -87,7 +88,7 @@ def distribution(data):
     counts = data['PERSON_INJURY'].value_counts()
     bar_chart(counts.index.to_list(), counts.values, title='Histogram for PERSON_INJURY',
               xlabel=symbolic_vars[n], ylabel='nr records', percentage=False)
-    savefig('images/histograms_binary.png')
+    savefig('images/profiling/histograms_binary.png')
 
     # histogram for numeric values
     print('Creating Histograms for Numeric Variables')
@@ -100,7 +101,18 @@ def distribution(data):
     axs.set_title(f'Histogram for PERSON_AGE for {bins} bins')
     axs.set_ylabel("nr records")
     axs.hist(column_age_cleaned, bins=bins, color=cfg.LINE_COLOR)
-    savefig('images/single_histograms_numeric.png')
+    savefig('images/profiling/single_histograms_numeric.png')
+
+    # gender distribution
+    n_male = len(data[data['PERSON_SEX'] == 'M'])
+    n_female = len(data[data['PERSON_SEX'] == 'F'])
+    n_male_killed = len(data[(data['PERSON_SEX'] == 'M') & (data['PERSON_INJURY'] == 'Killed')])
+    n_female_killed = len(data[(data['PERSON_SEX'] == 'F') & (data['PERSON_INJURY'] == 'Killed')])
+
+    figure(figsize=[7, 7])
+    bar_chart(['Male', 'Female', 'Males Killed', 'Females Killed'], [n_male, n_female, n_male_killed, n_female_killed],
+              title='Data Distribution of "Killed" for Gender', rotation=True)
+    savefig('./images/profiling/dimensionality_gender.png')
 
 
 def sparsity(data):
@@ -119,7 +131,7 @@ def sparsity(data):
             axs[i, j - 1].set_xlabel(var1)
             axs[i, j - 1].set_ylabel(var2)
             axs[i, j - 1].scatter(data[var1], data[var2])
-    savefig(f'images/sparsity_study_numeric.png')
+    savefig(f'images/profiling/sparsity_study_numeric.png')
 
     # heatmap
     print("Creating Heatmap")
@@ -127,4 +139,4 @@ def sparsity(data):
     corr_mtx = abs(data_means.corr())
     heatmap(abs(corr_mtx), xticklabels=corr_mtx.columns, yticklabels=corr_mtx.columns, annot=True, cmap='Blues')
     title('Correlation analysis')
-    savefig(f'images/correlation_analysis.png')
+    savefig(f'images/profiling/correlation_analysis.png')

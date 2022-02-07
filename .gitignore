@@ -7,6 +7,7 @@ __pycache__/
 
 # project
 images/
+.xlsx
 
 # custom mac
 .DS_Store
